@@ -3,6 +3,8 @@ package fr.dylanhanique.collectoryapi.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import fr.dylanhanique.collectoryapi.dto.CreateUserRequest;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,15 +24,18 @@ public class User {
     private Long id;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    @Size(min = 3)
     private String username;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    @NotBlank
     private String email;
 
     @Setter
     @Column(nullable = false)
+    @Size(min = 8)
     private String password;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
