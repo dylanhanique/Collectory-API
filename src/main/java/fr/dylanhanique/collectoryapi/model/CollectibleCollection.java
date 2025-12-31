@@ -5,15 +5,18 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "collections")
-public class Collection {
+public class CollectibleCollection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,12 +38,23 @@ public class Collection {
     @JsonManagedReference
     private User user;
 
-    public Collection(String name, User user) {
+    @CreationTimestamp
+    @Column(updatable = false, name = "created_at")
+    private Date createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
+    @Column(name = "deleted_at")
+    private Date deletedAt;
+
+    public CollectibleCollection(String name, User user) {
         this.name = name;
         this.user = user;
     };
 
-    public Collection(String name, String coverImageUrl, String description, User user) {
+    public CollectibleCollection(String name, String coverImageUrl, String description, User user) {
         this.name = name;
         this.user = user;
         this.coverImageUrl = coverImageUrl;

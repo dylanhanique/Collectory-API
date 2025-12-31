@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Getter
 @NoArgsConstructor
@@ -22,6 +25,7 @@ public class CollectibleItem {
 
     private String description;
 
+    @Column(name = "image_url")
     private String imageUrl;
 
     private BigDecimal value;
@@ -33,11 +37,22 @@ public class CollectibleItem {
 
     @ManyToOne
     @JsonBackReference
-    private Collection collection;
+    private CollectibleCollection collectibleCollection;
 
-    public CollectibleItem(String name, Collection collection) {
+    @CreationTimestamp
+    @Column(updatable = false, name = "created_at")
+    private Date createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
+    @Column(name = "deleted_at")
+    private Date deletedAt;
+
+    public CollectibleItem(String name, CollectibleCollection collectibleCollection) {
         this.name = name;
-        this.collection = collection;
+        this.collectibleCollection = collectibleCollection;
     }
 
 }
