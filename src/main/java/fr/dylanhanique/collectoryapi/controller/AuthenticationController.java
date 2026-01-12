@@ -40,6 +40,6 @@ public class AuthenticationController {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
         String jwtToken = jwtService.generateToken(authenticatedUser);
 
-        return new LoginResponse(jwtToken, jwtService.getExpirationTime());
+        return new LoginResponse(jwtToken);
     }
 }
