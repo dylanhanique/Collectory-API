@@ -1,6 +1,6 @@
 package fr.dylanhanique.collectoryapi.service;
 
-import fr.dylanhanique.collectoryapi.dto.CreateUserRequest;
+import fr.dylanhanique.collectoryapi.dto.RegisterUserRequest;
 import fr.dylanhanique.collectoryapi.dto.UserResponse;
 import fr.dylanhanique.collectoryapi.exception.EmailAlreadyTakenException;
 import fr.dylanhanique.collectoryapi.exception.UserNotFoundException;
@@ -48,7 +48,7 @@ public class UserServiceTest {
         @Test
         @DisplayName("create should add in database and return user")
         void create_whenDtoIsCorrect_createInDbAndReturnUser() {
-            CreateUserRequest dto = new CreateUserRequest("New user", "newuser@email.com", "password");
+            RegisterUserRequest dto = new RegisterUserRequest("New user", "newuser@email.com", "password");
             when(userRepository.existsByEmail(dto.email())).thenReturn(false);
             when(userRepository.existsByUsername(dto.username())).thenReturn(false);
             when(passwordEncoder.encode(dto.password())).thenReturn("encodedPassword");
@@ -67,15 +67,15 @@ public class UserServiceTest {
 
         private static Stream<Arguments> create_failureCases() {
             return Stream.of(
-                    Arguments.of(new CreateUserRequest("UsernameAlreadyTaken", "takenusername@email.com", "password"), UsernameAlreadyTakenException.class),
-                    Arguments.of(new CreateUserRequest("New user", "emailAlreadyTaken@email.com", "password"), EmailAlreadyTakenException.class)
+                    Arguments.of(new RegisterUserRequest("User", "user@email.com", "password"), UsernameAlreadyTakenException.class),
+                    Arguments.of(new RegisterUserRequest("New user", "user@email.com", "password"), EmailAlreadyTakenException.class)
             );
         }
 
         @ParameterizedTest
         @MethodSource("create_failureCases")
         @DisplayName("Create should throw an exception when request is invalid")
-        void create_invalidRequests_throwExceptions(CreateUserRequest dto, Class<? extends Exception> expectedException) {
+        void create_invalidRequests_throwExceptions(RegisterUserRequest dto, Class<? extends Exception> expectedException) {
             if (expectedException == UsernameAlreadyTakenException.class) {
                 when(userRepository.existsByUsername(dto.username())).thenReturn(true);
             } else if (expectedException == EmailAlreadyTakenException.class) {
@@ -93,7 +93,7 @@ public class UserServiceTest {
         @Test
         @DisplayName("findById should return user when user exist")
         void findById_userExist_returnsUser() {
-            User user = new User(1L, "User 1", "user1@email.com", "encodedPassword");
+            User user = new User(1L, "User", "user@email.com", "password");
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
             UserResponse result = userService.findById(user.getId());
@@ -111,6 +111,35 @@ public class UserServiceTest {
             when(userRepository.findById(userId)).thenThrow(new UserNotFoundException(userId));
 
             assertThatThrownBy(() -> userService.findById(userId)).isInstanceOf(UserNotFoundException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("FindByEmail")
+    class FindByEmail {
+
+        @Test
+        @DisplayName("findByEmail should return user when user exist")
+        void findByEmail_userExist_returnUser() {
+            User user = new User(1L, "User", "user@email.com", "password");
+            when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+            User result = userService.findByEmail(user.getEmail());
+
+            verify(userRepository).findByEmail(user.getEmail());
+            assertThat(result.getId()).isEqualTo(user.getId());
+            assertThat(result.getUsername()).isEqualTo(user.getUsername());
+            assertThat(result.getEmail()).isEqualTo(user.getEmail());
+            assertThat(result.getPassword()).isEqualTo(user.getPassword());
+        }
+
+        @Test
+        @DisplayName("FindByEmail should throw an exception when user does not exist")
+        void findByEmail_userDoesNotExist_throwException() {
+            String email = "wrongemail@email.com";
+            when(userRepository.findByEmail(email)).thenThrow(new UserNotFoundException(email));
+
+            assertThatThrownBy(() -> userService.findByEmail(email)).isInstanceOf(UserNotFoundException.class);
         }
     }
 }
