@@ -30,7 +30,7 @@ public class CollectibleCollection {
 
     private String description;
 
-    @OneToMany(mappedBy = "collection", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collectibleCollection", fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<CollectibleItem> collectibleItems = new ArrayList<CollectibleItem>();
 
