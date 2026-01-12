@@ -28,9 +28,11 @@ public class CollectibleItem {
     @Column(name = "image_url")
     private String imageUrl;
 
-    private BigDecimal value;
+    @Column(name = "item_value")
+    private BigDecimal itemValue;
 
-    private Integer year;
+    @Column(name = "release_year")
+    private Integer releaseYear;
 
     @Enumerated(EnumType.STRING)
     private Rarity rarity;
