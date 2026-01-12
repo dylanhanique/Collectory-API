@@ -1,6 +1,6 @@
 package fr.dylanhanique.collectoryapi.service;
 
-import fr.dylanhanique.collectoryapi.dto.CreateUserRequest;
+import fr.dylanhanique.collectoryapi.dto.RegisterUserRequest;
 import fr.dylanhanique.collectoryapi.dto.UserResponse;
 import fr.dylanhanique.collectoryapi.exception.EmailAlreadyTakenException;
 import fr.dylanhanique.collectoryapi.exception.UserNotFoundException;
@@ -24,7 +24,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResponse create(CreateUserRequest dto) {
+    public UserResponse create(RegisterUserRequest dto) {
         if (userRepository.existsByEmail(dto.email())) {
             throw new EmailAlreadyTakenException(dto.email());
         } else if (userRepository.existsByUsername(dto.username())) {
@@ -42,5 +42,10 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         return UserMapper.toResponse(user);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 }
